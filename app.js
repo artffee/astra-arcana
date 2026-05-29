@@ -448,130 +448,175 @@
     profileNote.style.color = tone === 'warn' ? '#ff8c42' : '#4dd6c8';
   }
 
-  if (profileForm) {
-    profileForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitBtn = profileForm.querySelector('button[type="submit"]');
-      const data = Object.fromEntries(new FormData(profileForm).entries());
-      const cityName = (data.cityName || '').trim();
-      if (!cityName) { flashNote('CITY OF BIRTH REQUIRED', 'warn'); return; }
-      if (!data.birthDate || !data.birthTime) { flashNote('DATE AND TIME REQUIRED', 'warn'); return; }
-      if (!window.jspdf || !window.jspdf.jsPDF) {
-        flashNote('PDF LIBRARY NOT LOADED · CHECK NETWORK', 'warn');
-        return;
+  /* ---------- paywall (Stripe Payment Links) ---------- */
+  // EDIT THESE: paste your 3 Stripe Payment Link URLs from the Stripe dashboard.
+  // For each link set the post-payment redirect (Stripe: 'After payment' -> 'Redirect') to:
+  //   star map -> https://tajnstvoto.com/?unlock=starmap
+  //   report   -> https://tajnstvoto.com/?unlock=report
+  //   bundle   -> https://tajnstvoto.com/?unlock=bundle
+  const PAYMENT_LINKS = {
+    starmap: 'PASTE_STRIPE_STARMAP_LINK',
+    report:  'PASTE_STRIPE_REPORT_LINK',
+    bundle:  'PASTE_STRIPE_BUNDLE_LINK',
+  };
+  const PRICES = { starmap: 9, report: 9, bundle: 15 };
+  const PENDING_KEY = 'tajnstvo:pending';
+
+  function isUnlocked(prod) {
+    try {
+      return localStorage.getItem('tajnstvo:unlock:' + prod) === '1'
+          || localStorage.getItem('tajnstvo:unlock:bundle') === '1';
+    } catch (_) { return false; }
+  }
+  function unlockProduct(prod) {
+    try {
+      localStorage.setItem('tajnstvo:unlock:' + prod, '1');
+      if (prod === 'bundle') {
+        localStorage.setItem('tajnstvo:unlock:starmap', '1');
+        localStorage.setItem('tajnstvo:unlock:report', '1');
       }
-
-      const oldText = submitBtn ? submitBtn.textContent : null;
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Geocoding…'; }
-      flashNote('GEOCODING CITY …');
-
-      let loc;
-      try {
-        loc = await geocodeCity(cityName);
-      } catch (err) {
-        flashNote(`COULD NOT FIND CITY · ${(err.message || '').toUpperCase()}`, 'warn');
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = oldText; }
-        return;
-      }
-
-      writeProfile({
-        name:      data.name,
-        birthDate: data.birthDate,
-        birthTime: data.birthTime,
-        cityName:  loc.name,
-        lat:       loc.lat,
-        lon:       loc.lon,
-        tz:        loc.tz,
-      });
-      profileForm.elements.cityName.value = loc.name;
-
-      // refresh inline UI in this session (cartography, transits, ticker)
-      refreshAll();
-
-      // build and download the PDF
-      if (submitBtn) submitBtn.textContent = 'Building PDF…';
-      flashNote('BUILDING PDF REPORT …');
-      try {
-        const chart = getNatalChart();
-        if (!chart) throw new Error('Could not compute chart');
-        let reading = null;
-        if (readApiKey()) {
-          if (submitBtn) submitBtn.textContent = 'Channelling reading...';
-          flashNote('CHANNELLING NATAL READING · CLAUDE-SONNET-4 · ~10 SEC');
-          reading = await fetchPdfNatalReading(chart);
-        }
-        if (submitBtn) submitBtn.textContent = 'Building PDF...';
-        flashNote('BUILDING PDF REPORT ...');
-        await generatePdfReport(chart, reading);
-        flashNote(`PDF DOWNLOADED · ${(chart.profile.name || 'NATIVE').toUpperCase()}${reading ? ' · WITH READING' : ''}`);
-      } catch (err) {
-        flashNote(`PDF BUILD FAILED · ${(err.message || '').toUpperCase()}`, 'warn');
-      } finally {
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = oldText; }
-      }
-    });
-    loadProfile();
-
-    // ---- star map button ----
-    const starMapBtn = document.getElementById('starMapBtn');
-    if (starMapBtn) {
-      starMapBtn.addEventListener('click', async () => {
-        if (!window.tajnstvoStarMap) {
-          flashNote('STAR MAP MODULE NOT LOADED', 'warn');
-          return;
-        }
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-          flashNote('PDF LIBRARY NOT LOADED · CHECK NETWORK', 'warn');
-          return;
-        }
-
-        const data = Object.fromEntries(new FormData(profileForm).entries());
-        const cityName = (data.cityName || '').trim();
-        if (!cityName) { flashNote('CITY OF BIRTH REQUIRED', 'warn'); return; }
-        if (!data.birthDate || !data.birthTime) { flashNote('DATE AND TIME REQUIRED', 'warn'); return; }
-
-        const oldText = starMapBtn.textContent;
-        starMapBtn.disabled = true;
-        starMapBtn.textContent = 'Geocoding…';
-        flashNote('GEOCODING CITY …');
-
-        let loc;
-        try {
-          loc = await geocodeCity(cityName);
-        } catch (err) {
-          flashNote(`COULD NOT FIND CITY · ${(err.message || '').toUpperCase()}`, 'warn');
-          starMapBtn.disabled = false;
-          starMapBtn.textContent = oldText;
-          return;
-        }
-
-        writeProfile({
-          name:      data.name,
-          birthDate: data.birthDate,
-          birthTime: data.birthTime,
-          cityName:  loc.name,
-          lat:       loc.lat,
-          lon:       loc.lon,
-          tz:        loc.tz,
-        });
-        profileForm.elements.cityName.value = loc.name;
-        refreshAll();
-
-        starMapBtn.textContent = 'Drawing the sky…';
-        flashNote('DRAWING THE NIGHT SKY …');
-        try {
-          const chart = getNatalChart();
-          if (!chart) throw new Error('Could not compute chart');
-          window.tajnstvoStarMap(chart);
-          flashNote(`STAR MAP DOWNLOADED · ${(chart.profile.name || 'NATIVE').toUpperCase()}`);
-        } catch (err) {
-          flashNote(`STAR MAP FAILED · ${(err.message || '').toUpperCase()}`, 'warn');
-        } finally {
-          starMapBtn.disabled = false;
-          starMapBtn.textContent = oldText;
-        }
-      });
+    } catch (_) {}
+  }
+  function savePendingFromForm() {
+    try {
+      const d = Object.fromEntries(new FormData(profileForm).entries());
+      localStorage.setItem(PENDING_KEY, JSON.stringify(d));
+    } catch (_) {}
+  }
+  function restorePendingToForm() {
+    try {
+      const raw = localStorage.getItem(PENDING_KEY);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (d.name)      profileForm.elements.name.value = d.name;
+      if (d.birthDate) profileForm.elements.birthDate.value = d.birthDate;
+      if (d.birthTime) profileForm.elements.birthTime.value = d.birthTime;
+      if (d.cityName)  profileForm.elements.cityName.value = d.cityName;
+      return true;
+    } catch (_) { return false; }
+  }
+  function openCheckout(prod) {
+    const url = PAYMENT_LINKS[prod];
+    if (!url || url.indexOf('PASTE') === 0) {
+      flashNote('PAYMENT LINK NOT SET YET', 'warn');
+      return false;
     }
+    savePendingFromForm();
+    window.location.href = url;
+    return true;
+  }
+  function refreshPaywallUI() {
+    const submitBtn = profileForm && profileForm.querySelector('button[type="submit"]');
+    const starMapBtn = document.getElementById('starMapBtn');
+    const bundle = document.getElementById('bundleUnlock');
+    if (submitBtn) submitBtn.textContent = isUnlocked('report') ? 'Generate soul report' : ('Unlock soul report \u00b7 $' + PRICES.report);
+    if (starMapBtn) starMapBtn.textContent = isUnlocked('starmap') ? '\u2605 Download star map' : ('\u2605 Unlock star map \u00b7 $' + PRICES.starmap);
+    if (bundle) {
+      const both = isUnlocked('starmap') && isUnlocked('report');
+      bundle.hidden = both;
+      bundle.textContent = 'Unlock both for $' + PRICES.bundle + ' \u2192';
+    }
+  }
+
+  function formReady() {
+    const d = Object.fromEntries(new FormData(profileForm).entries());
+    if (!(d.cityName || '').trim()) { flashNote('CITY OF BIRTH REQUIRED', 'warn'); return false; }
+    if (!d.birthDate || !d.birthTime) { flashNote('DATE AND TIME REQUIRED', 'warn'); return false; }
+    return true;
+  }
+
+  async function castFromForm() {
+    const data = Object.fromEntries(new FormData(profileForm).entries());
+    const loc = await geocodeCity((data.cityName || '').trim());
+    writeProfile({ name: data.name, birthDate: data.birthDate, birthTime: data.birthTime,
+      cityName: loc.name, lat: loc.lat, lon: loc.lon, tz: loc.tz });
+    profileForm.elements.cityName.value = loc.name;
+    refreshAll();
+  }
+
+  async function runReportDownload() {
+    if (!formReady()) return;
+    if (!window.jspdf || !window.jspdf.jsPDF) { flashNote('PDF LIBRARY NOT LOADED', 'warn'); return; }
+    if (!isUnlocked('report')) { flashNote('REDIRECTING TO SECURE CHECKOUT \u2026'); openCheckout('report'); return; }
+    const submitBtn = profileForm.querySelector('button[type="submit"]');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Geocoding\u2026'; }
+    flashNote('GEOCODING CITY \u2026');
+    try { await castFromForm(); }
+    catch (err) { flashNote('COULD NOT FIND CITY \u00b7 ' + (err.message || '').toUpperCase(), 'warn'); if (submitBtn) submitBtn.disabled = false; refreshPaywallUI(); return; }
+    if (submitBtn) submitBtn.textContent = 'Building PDF\u2026';
+    flashNote('BUILDING PDF REPORT \u2026');
+    try {
+      const chart = getNatalChart();
+      if (!chart) throw new Error('Could not compute chart');
+      let reading = null;
+      if (readApiKey()) {
+        if (submitBtn) submitBtn.textContent = 'Channelling reading\u2026';
+        flashNote('CHANNELLING NATAL READING \u00b7 CLAUDE-SONNET-4 \u00b7 ~10 SEC');
+        reading = await fetchPdfNatalReading(chart);
+      }
+      if (submitBtn) submitBtn.textContent = 'Building PDF\u2026';
+      await generatePdfReport(chart, reading);
+      flashNote('PDF DOWNLOADED \u00b7 ' + (chart.profile.name || 'NATIVE').toUpperCase() + (reading ? ' \u00b7 WITH READING' : ''));
+    } catch (err) {
+      flashNote('PDF BUILD FAILED \u00b7 ' + (err.message || '').toUpperCase(), 'warn');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+      refreshPaywallUI();
+    }
+  }
+
+  async function runStarMapDownload() {
+    if (!formReady()) return;
+    if (!window.tajnstvoStarMap) { flashNote('STAR MAP MODULE NOT LOADED', 'warn'); return; }
+    if (!window.jspdf || !window.jspdf.jsPDF) { flashNote('PDF LIBRARY NOT LOADED', 'warn'); return; }
+    if (!isUnlocked('starmap')) { flashNote('REDIRECTING TO SECURE CHECKOUT \u2026'); openCheckout('starmap'); return; }
+    const starMapBtn = document.getElementById('starMapBtn');
+    if (starMapBtn) { starMapBtn.disabled = true; starMapBtn.textContent = 'Geocoding\u2026'; }
+    flashNote('GEOCODING CITY \u2026');
+    try { await castFromForm(); }
+    catch (err) { flashNote('COULD NOT FIND CITY \u00b7 ' + (err.message || '').toUpperCase(), 'warn'); if (starMapBtn) starMapBtn.disabled = false; refreshPaywallUI(); return; }
+    if (starMapBtn) starMapBtn.textContent = 'Drawing the sky\u2026';
+    flashNote('DRAWING THE NIGHT SKY \u2026');
+    try {
+      const chart = getNatalChart();
+      if (!chart) throw new Error('Could not compute chart');
+      window.tajnstvoStarMap(chart);
+      flashNote('STAR MAP DOWNLOADED \u00b7 ' + (chart.profile.name || 'NATIVE').toUpperCase());
+    } catch (err) {
+      flashNote('STAR MAP FAILED \u00b7 ' + (err.message || '').toUpperCase(), 'warn');
+    } finally {
+      if (starMapBtn) starMapBtn.disabled = false;
+      refreshPaywallUI();
+    }
+  }
+
+  if (profileForm) {
+    profileForm.addEventListener('submit', (e) => { e.preventDefault(); runReportDownload(); });
+    const starMapBtn = document.getElementById('starMapBtn');
+    if (starMapBtn) starMapBtn.addEventListener('click', () => runStarMapDownload());
+    const bundle = document.getElementById('bundleUnlock');
+    if (bundle) bundle.addEventListener('click', (e) => { e.preventDefault(); openCheckout('bundle'); });
+
+    // return from Stripe checkout: ?unlock=starmap|report|bundle
+    (function handleUnlockReturn() {
+      const params = new URLSearchParams(location.search);
+      const u = params.get('unlock');
+      if (u && ['starmap', 'report', 'bundle'].indexOf(u) !== -1) {
+        unlockProduct(u);
+        params.delete('unlock');
+        const clean = location.pathname + (params.toString() ? '?' + params.toString() : '') + location.hash;
+        history.replaceState({}, '', clean);
+        restorePendingToForm();
+        flashNote('\u2713 UNLOCKED \u00b7 ' + u.toUpperCase() + ' \u2014 GENERATING \u2026');
+        setTimeout(() => {
+          if (u === 'report') runReportDownload();
+          else if (u === 'starmap') runStarMapDownload();
+        }, 500);
+      }
+    })();
+
+    refreshPaywallUI();
+    loadProfile();
   }
 
 

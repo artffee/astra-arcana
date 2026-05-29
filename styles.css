@@ -587,6 +587,23 @@ section {
   letter-spacing: 0.2em;
 }
 
+.profile__bundle-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.profile__bundle {
+  color: var(--amber);
+  letter-spacing: 0.16em;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.18s;
+}
+.profile__bundle:hover { border-bottom-color: var(--amber); }
+.profile__bundle[hidden] { display: none; }
+.profile__secure { color: var(--warm); letter-spacing: 0.18em; opacity: 0.75; }
+
 .profile__contents {
   margin-top: 22px;
   color: var(--warm);
