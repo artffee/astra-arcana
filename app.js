@@ -486,7 +486,7 @@
     report:  'PASTE_STRIPE_REPORT_LINK',
     bundle:  'PASTE_STRIPE_BUNDLE_LINK',
   };
-  const PRICES = { starmap: 9, report: 9, bundle: 15 };
+  const PRICES = { starmap: 9, report: 15, bundle: 19 };
   const PENDING_KEY = 'tajnstvo:pending';
 
   function isUnlocked(prod) {
@@ -536,8 +536,8 @@
     const submitBtn = profileForm && profileForm.querySelector('button[type="submit"]');
     const starMapBtn = document.getElementById('starMapBtn');
     const bundle = document.getElementById('bundleUnlock');
-    if (submitBtn) submitBtn.textContent = isUnlocked('report') ? 'Generate soul report' : ('Unlock soul report \u00b7 $' + PRICES.report);
-    if (starMapBtn) starMapBtn.textContent = isUnlocked('starmap') ? '\u2605 Download star map' : ('\u2605 Unlock star map \u00b7 $' + PRICES.starmap);
+    if (submitBtn) submitBtn.textContent = isUnlocked('report') ? 'Download your Soul Report' : ('Get your Soul Report \u00b7 $' + PRICES.report);
+    if (starMapBtn) starMapBtn.textContent = isUnlocked('starmap') ? '\u2605 Download star map' : ('\u2605 Just the star map \u00b7 $' + PRICES.starmap);
     if (bundle) {
       const both = isUnlocked('starmap') && isUnlocked('report');
       bundle.hidden = both;

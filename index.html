@@ -44,7 +44,6 @@
 <script src="starmap.js" defer></script>
 <script src="soulreport-data.js" defer></script>
 <script src="frequencies.js" defer></script>
-<script src="frequency-reader.js" defer></script>
 <script src="program.js" defer></script>
 </head>
 <body>
@@ -63,11 +62,10 @@
       <span class="brand__name">TAJNSTVO</span>
     </a>
     <nav class="topnav">
-      <a href="#oracles">Oracles</a>
-      <a href="#engine">Engine</a>
-      <a href="#cartography">Cartography</a>
-      <a href="#ritual">Ritual</a>
-      <a href="#spec">Spec</a>
+      <a href="#inside">What's inside</a>
+      <a href="#oracles">Free tools</a>
+      <a href="#faq">FAQ</a>
+      <a href="/spec">Spec</a>
     </nav>
     <div class="topbar__meta">
       <button type="button" class="apikey-trigger" id="apiKeyTrigger" aria-expanded="false" aria-controls="apiKeyPop" title="Activate live oracle readings">
@@ -93,125 +91,106 @@
 <main id="top">
 
   <!-- HERO -->
-  <section class="hero">
-    <div class="hero__grid">
-      <div class="hero__sidekick">
-        <div class="eyebrow"><span class="bar"></span>CELESTIAL ATLAS · MULTI-AGENT COSMOGRAPHY</div>
-        <p class="mono mono--small">QUOD SUPRA EST,<br>SICUT QUOD INFRA</p>
-      </div>
-
-      <div class="hero__main">
-        <h1 class="display">
-          <span class="display__line display__line--italic">Tajnstvo</span>
-        </h1>
-        <p class="lede">
-          A unified astrological platform — four conversational oracles, an in-browser astronomical engine, two cartographic experiences, and two embodied rituals. Hellenistic tradition meets modern Western astrology, real-time astrocartography, and an ancient fire ritual.
+  <section class="hero" id="hero">
+    <div class="hero__layout">
+      <div class="hero__copy">
+        <div class="eyebrow"><span class="bar"></span>TAJNSTVO · CELESTIAL ATLAS</div>
+        <h1 class="hero__headline">Your personalized <span class="hero__em">soul report.</span></h1>
+        <p class="hero__sub">
+          A detailed written reading of your <strong>soul mission, karmic patterns, gifts, and shadows</strong> — drawn from your exact birth chart and numerology, delivered as an instant PDF in about two minutes.
         </p>
-        <div class="hero__cta">
-          <a class="btn btn--solid" href="#oracles">Begin reading <span aria-hidden="true">→</span></a>
-          <a class="btn btn--ghost" href="#engine">Read the spec</a>
-        </div>
+
+        <form class="hero__form" id="profileForm" novalidate>
+          <div class="hero__fields">
+            <label class="field">
+              <span class="field__label mono mono--small">NAME</span>
+              <input type="text" name="name" placeholder="Your name" autocomplete="given-name" />
+            </label>
+            <label class="field">
+              <span class="field__label mono mono--small">DATE OF BIRTH</span>
+              <input type="date" name="birthDate" value="1992-03-21" />
+            </label>
+            <label class="field">
+              <span class="field__label mono mono--small">TIME (24H)</span>
+              <input type="time" name="birthTime" value="07:42" />
+            </label>
+            <label class="field">
+              <span class="field__label mono mono--small">CITY OF BIRTH</span>
+              <input type="text" name="cityName" id="cityName" list="cityHints" placeholder="Sofia, Bulgaria" autocomplete="off" spellcheck="false" required />
+              <datalist id="cityHints">
+                <option value="London, United Kingdom"></option>
+                <option value="New York, United States"></option>
+                <option value="Los Angeles, United States"></option>
+                <option value="Paris, France"></option>
+                <option value="Berlin, Germany"></option>
+                <option value="Lisbon, Portugal"></option>
+                <option value="Tokyo, Japan"></option>
+                <option value="Sydney, Australia"></option>
+                <option value="Mumbai, India"></option>
+                <option value="São Paulo, Brazil"></option>
+                <option value="Cape Town, South Africa"></option>
+                <option value="Mexico City, Mexico"></option>
+                <option value="Sofia, Bulgaria"></option>
+                <option value="Athens, Greece"></option>
+                <option value="Istanbul, Türkiye"></option>
+                <option value="Reykjavík, Iceland"></option>
+              </datalist>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn--solid btn--hero">Get your Soul Report · $15</button>
+          <p class="hero__secure mono mono--small">✦ SECURE STRIPE CHECKOUT · INSTANT PDF · NO ACCOUNT NEEDED</p>
+          <p class="profile__note mono mono--small" id="profileNote">Enter your birth details to begin.</p>
+        </form>
+
+        <p class="hero__freepaid">
+          <strong>All the tools below are free to explore</strong> — chart wheel, transits, astrocartography, oracles, frequencies. The personalized written report is <strong>$15</strong>.
+        </p>
+        <p class="hero__secondary mono mono--small">
+          <a href="#" id="starMapBtn">★ Just the star map · $9</a>
+          <a href="#" id="bundleUnlock">Both for $15 →</a>
+        </p>
       </div>
 
-      <aside class="hero__panel" aria-label="System summary">
-        <div class="panel">
-          <div class="panel__header"><span class="mono mono--small">SYS / 01</span><span class="mono mono--small">→</span></div>
-          <dl class="kv">
-            <div><dt>Status</dt><dd>Live · May 2026</dd></div>
-            <div><dt>Model</dt><dd>claude‑sonnet‑4</dd></div>
-            <div><dt>Stack</dt><dd>React 18 · Canvas · Web Audio</dd></div>
-            <div><dt>Modules</dt><dd>8 oracles &amp; tools</dd></div>
-            <div><dt>Engine</dt><dd>Schlyter · ±1° / 1900–2100</dd></div>
-            <div><dt>Footprint</dt><dd>~1,610 LOC · single file</dd></div>
-          </dl>
-        </div>
-
-        <div class="panel panel--accent">
-          <div class="panel__header"><span class="mono mono--small">SKY / NOW</span><span class="mono mono--small" id="liveTime">--:--</span></div>
-          <ul class="ticker">
-            <li><span class="glyph">☉</span><span>Sun</span><span class="mono" data-sky="sun">— Tau 16°</span></li>
-            <li><span class="glyph">☾</span><span>Moon</span><span class="mono" data-sky="moon">— Lib 04°</span></li>
-            <li><span class="glyph">☿</span><span>Mercury</span><span class="mono" data-sky="mercury">— Tau 02° ℞</span></li>
-            <li><span class="glyph">♀</span><span>Venus</span><span class="mono" data-sky="venus">— Ari 28°</span></li>
-            <li><span class="glyph">♂</span><span>Mars</span><span class="mono" data-sky="mars">— Leo 11°</span></li>
-          </ul>
-        </div>
+      <aside class="hero__preview" aria-label="Sample report pages">
+        <img src="sample-4.png" alt="Sample page from the Tajnstvo soul report — numerology" class="hero__preview-img hero__preview-img--front" loading="eager" />
+        <img src="sample-2.png" alt="Sample page from the soul report — chart wheel" class="hero__preview-img hero__preview-img--back" loading="lazy" />
+        <span class="hero__preview-tag mono mono--small">YOUR REPORT · 7 PAGES · INSTANT PDF</span>
       </aside>
-    </div>
-
-    <div class="hero__rule">
-      <span class="mono mono--small">↓ EIGHT EXPERIENCES · ONE BIRTH PROFILE</span>
     </div>
   </section>
 
 
-  <!-- BIRTH PROFILE -->
-  <section class="profile" id="profile">
+  <!-- WHAT'S INSIDE -->
+  <section class="inside" id="inside">
     <div class="section__head">
       <span class="section__num">§ 01</span>
-      <h2 class="section__title">Birth Profile</h2>
-      <p class="section__sub">One source of truth, persisted across every reading.</p>
+      <h2 class="section__title">What's inside</h2>
+      <p class="section__sub">Every report is computed live from your exact birth data — no two are alike.</p>
     </div>
 
-    <form class="profile__form" id="profileForm" novalidate>
-      <label class="field">
-        <span class="field__label mono mono--small">NAME / OPTIONAL</span>
-        <input type="text" name="name" placeholder="Your name" autocomplete="given-name" />
-      </label>
-      <label class="field">
-        <span class="field__label mono mono--small">DATE OF BIRTH</span>
-        <input type="date" name="birthDate" value="1992-03-21" />
-      </label>
-      <label class="field">
-        <span class="field__label mono mono--small">TIME (24H)</span>
-        <input type="time" name="birthTime" value="07:42" />
-      </label>
-      <label class="field">
-        <span class="field__label mono mono--small">CITY OF BIRTH</span>
-        <input type="text" name="cityName" id="cityName" list="cityHints" placeholder="Sofia, Bulgaria" autocomplete="off" spellcheck="false" required />
-        <datalist id="cityHints">
-          <option value="London, United Kingdom"></option>
-          <option value="New York, United States"></option>
-          <option value="Los Angeles, United States"></option>
-          <option value="Paris, France"></option>
-          <option value="Berlin, Germany"></option>
-          <option value="Lisbon, Portugal"></option>
-          <option value="Tokyo, Japan"></option>
-          <option value="Sydney, Australia"></option>
-          <option value="Mumbai, India"></option>
-          <option value="São Paulo, Brazil"></option>
-          <option value="Cape Town, South Africa"></option>
-          <option value="Mexico City, Mexico"></option>
-          <option value="Sofia, Bulgaria"></option>
-          <option value="Athens, Greece"></option>
-          <option value="Istanbul, Türkiye"></option>
-          <option value="Reykjavík, Iceland"></option>
-        </datalist>
-      </label>
-      <div class="profile__actions">
-        <button type="submit" class="btn btn--solid btn--field">Generate soul report</button>
-        <button type="button" id="starMapBtn" class="btn btn--ghost btn--field">★ Download star map</button>
+    <div class="inside__grid">
+      <ul class="inside__list">
+        <li><span class="inside__k">Big Three</span><span class="inside__v">Sun, Moon &amp; Rising — your core identity, emotional world, and the face you show.</span></li>
+        <li><span class="inside__k">Soul Mission</span><span class="inside__v">Your North Node direction and Life Path number — where the soul is headed.</span></li>
+        <li><span class="inside__k">Numerology</span><span class="inside__v">Life Path, Expression, Soul Urge, Personality &amp; Birthday numbers, from name and date.</span></li>
+        <li><span class="inside__k">Karmic Patterns &amp; Shadows</span><span class="inside__v">Your greatest wounds — anchored in Saturn and the 12th house — and how to meet them.</span></li>
+        <li><span class="inside__k">Gifts &amp; Domains</span><span class="inside__v">Relationships, career, and finances, read through the houses and rulers.</span></li>
+        <li><span class="inside__k">Chart Wheel</span><span class="inside__v">A full natal wheel with whole-sign houses and aspect lines.</span></li>
+        <li><span class="inside__k">Astrocartography</span><span class="inside__v">Your planetary lines projected across the Earth.</span></li>
+        <li><span class="inside__k">Today's Transits</span><span class="inside__v">The current sky measured against your chart, the day you generate it.</span></li>
+      </ul>
+
+      <div class="inside__previews">
+        <img src="sample-3.png" alt="Soul report sample — Soul Mission and Big Three" class="inside__page" loading="lazy" />
+        <img src="sample-4.png" alt="Soul report sample — Numerology" class="inside__page" loading="lazy" />
+        <img src="sample-2.png" alt="Soul report sample — Chart Wheel" class="inside__page" loading="lazy" />
       </div>
-    </form>
+    </div>
 
-    <p class="profile__bundle-row">
-      <a href="#" id="bundleUnlock" class="profile__bundle mono mono--small">Unlock both for $15 →</a>
-      <span class="profile__secure mono mono--small">SECURE CHECKOUT · STRIPE · INSTANT DOWNLOAD</span>
+    <p class="inside__cta">
+      <a href="#hero" class="btn btn--solid">Get your Soul Report · $15</a>
     </p>
-
-    <p class="profile__contents mono mono--small">
-      SOUL REPORT INCLUDES &nbsp;·&nbsp;
-      Big Three reading &nbsp;·&nbsp;
-      Life Path number &nbsp;·&nbsp;
-      Soul Mission &nbsp;·&nbsp;
-      Greatest Wounds &nbsp;·&nbsp;
-      Relationships, Career, Finances &nbsp;·&nbsp;
-      Chart Wheel &nbsp;·&nbsp;
-      Astrocartography &nbsp;·&nbsp;
-      Today’s Transits
-    </p>
-
-    <p class="profile__note mono mono--small" id="profileNote">FILL THE FORM · GET YOUR SOUL REPORT</p>
   </section>
 
 
@@ -585,91 +564,22 @@
   </section>
 
 
-  <!-- FREQUENCY READER -->
-  <section class="reader" id="reader">
-    <div class="section__head">
-      <span class="section__num">§ 08</span>
-      <h2 class="section__title">Frequency Reader</h2>
-      <p class="section__sub">Body and voice are the two channels through which you broadcast your state. The reader samples each privately, in this browser, and never uploads anything.</p>
+  <!-- DEEPER TOOLS LINK -->
+  <section class="deeper" id="deeper">
+    <div class="deeper__inner">
+      <div>
+        <p class="deeper__eyebrow mono mono--small">EXPERIMENTAL</p>
+        <h2 class="deeper__title">Deeper tools</h2>
+        <p class="deeper__sub">The Frequency Reader measures your live energetic state from a camera pulse reading and your voice — entirely in your browser. Moved to its own room to keep this page focused.</p>
+      </div>
+      <a class="btn btn--ghost" href="/tools">Open the Frequency Reader →</a>
     </div>
-
-    <p class="reader__hero">You are a frequency.</p>
-
-    <div class="reader__grid">
-
-      <!-- BODY -->
-      <article class="reader-card" data-reader="body">
-        <header class="reader-card__head">
-          <span class="reader-card__step mono mono--small">STEP 1 / BODY</span>
-          <span class="reader-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4">
-              <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z"/>
-            </svg>
-          </span>
-        </header>
-        <h3 class="reader-card__title">Body Reading</h3>
-        <p class="reader-card__desc">Place your fingertip fully over the back camera lens and hold still for fifteen seconds. The reader will detect your pulse from the slight pink-to-red drift in the image.</p>
-
-        <video class="reader-card__video" hidden playsinline muted></video>
-        <canvas class="reader-card__work" width="240" height="180" hidden></canvas>
-        <canvas class="reader-card__viz"  width="240" height="60"></canvas>
-
-        <p class="reader-card__status mono mono--small">15 seconds  ·  finger on lens</p>
-        <div class="reader-card__result" hidden></div>
-
-        <footer class="reader-card__actions">
-          <button class="btn btn--solid" type="button" data-action="begin">Begin body reading</button>
-          <button class="btn btn--ghost" type="button" data-action="skip">Skip</button>
-        </footer>
-      </article>
-
-      <!-- VOICE -->
-      <article class="reader-card" data-reader="voice">
-        <header class="reader-card__head">
-          <span class="reader-card__step mono mono--small">STEP 2 / VOICE</span>
-          <span class="reader-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4">
-              <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z"/>
-              <path d="M19 11a7 7 0 0 1-14 0M12 18v3"/>
-            </svg>
-          </span>
-        </header>
-        <h3 class="reader-card__title">Voice Reading</h3>
-        <p class="reader-card__desc">Hold the device near your face and read the line below aloud — calmly, at your natural volume — for ten seconds.</p>
-
-        <blockquote class="reader-card__quote">
-          <em>I am here. I am listening to the part of me that already knows.</em>
-        </blockquote>
-
-        <canvas class="reader-card__viz" width="240" height="60"></canvas>
-
-        <p class="reader-card__status mono mono--small">10 seconds  ·  natural voice</p>
-        <div class="reader-card__result" hidden></div>
-
-        <footer class="reader-card__actions">
-          <button class="btn btn--solid" type="button" data-action="begin">Begin voice reading</button>
-          <button class="btn btn--ghost" type="button" data-action="skip">Skip</button>
-        </footer>
-      </article>
-
-    </div>
-
-    <div class="reader__output" hidden>
-      <p class="reader__output-eyebrow mono mono--small">YOUR FREQUENCY</p>
-      <p class="reader__output-num"></p>
-      <p class="reader__output-name"></p>
-      <p class="reader__output-desc"></p>
-      <p class="reader__output-meta mono mono--small"></p>
-    </div>
-
-    <p class="reader__privacy mono mono--small">PRIVACY · CAMERA AND MICROPHONE STREAMS ARE RELEASED THE MOMENT EACH READING ENDS. NOTHING LEAVES YOUR BROWSER.</p>
   </section>
-
 
   <!-- 45-DAY PROGRAM -->
   <section class="program" id="program">
     <div class="section__head">
-      <span class="section__num">§ 09</span>
+      <span class="section__num">§ 08</span>
       <h2 class="section__title">45-Day Sky Companion</h2>
       <p class="section__sub">A guided arc through the next six weeks of your sky. Each day surfaces the day's strongest transit and pairs it with a theme, a single action, and a reflection.</p>
     </div>
@@ -714,69 +624,47 @@
   </section>
 
 
-  <!-- SPEC -->
-  <section class="spec" id="spec">
+  <!-- FAQ -->
+  <section class="faq" id="faq">
     <div class="section__head">
-      <span class="section__num">§ 10</span>
-      <h2 class="section__title">Specification</h2>
-      <p class="section__sub">The architecture, in one passage.</p>
+      <span class="section__num">§ 09</span>
+      <h2 class="section__title">Questions</h2>
+      <p class="section__sub">The things worth knowing before you generate your report.</p>
     </div>
 
-    <div class="spec__grid">
-      <div class="spec__col">
-        <h4 class="mono mono--small">UI · FRAMEWORK</h4>
-        <p>React 18 with hooks · single‑file JSX artifact</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">AI · MODEL</h4>
-        <p>claude-sonnet-4-20250514 · max_tokens 1500</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">ENGINE</h4>
-        <p>Custom Schlyter implementation · ecliptic + equatorial</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">ANIMATION</h4>
-        <p>HTML Canvas 2D · 60 fps · CSS keyframes · SVG</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">VOICE</h4>
-        <p>Web Speech API · automatic English voice selection</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">AUDIO</h4>
-        <p>Web Audio API · procedural noise + biquad filters</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">PERSISTENCE</h4>
-        <p>window.storage · async load/save · ~5 MB ceiling</p>
-      </div>
-      <div class="spec__col">
-        <h4 class="mono mono--small">TYPOGRAPHY</h4>
-        <p>Cinzel · EB Garamond · Cormorant · Cormorant SC</p>
-      </div>
-    </div>
-
-    <div class="roadmap">
-      <h3 class="roadmap__title">Roadmap</h3>
-
-      <ol class="roadmap__list">
-        <li>
-          <span class="mono mono--small">v1.0 · LIVE · MAY 2026</span>
-          <p>Eight modules · shared profile · Schlyter engine · five‑aspect detection · voice synthesis · procedural audio.</p>
-        </li>
-        <li>
-          <span class="mono mono--small">v1.5 · Q3 2026</span>
-          <p>Multi‑turn oracle conversations · reading history · aspect timing predictions · geocoded city input · ElevenLabs voice · Stripe paywall.</p>
-        </li>
-        <li>
-          <span class="mono mono--small">v2.0 · Q1 2027</span>
-          <p>React Native iOS / Android · full chart‑vs‑chart synastry · annual PDF transit report · multi‑user shared charts · localization (ES, DE, BG, PT).</p>
-        </li>
-      </ol>
+    <div class="faq__list">
+      <details class="faq__item" open><summary>What exactly do I get for $15?</summary>
+        <p>A multi-page, print-ready PDF built from your exact birth data: your Big Three, Soul Mission, full numerology (Life Path, Expression, Soul Urge, Personality, Birthday), karmic patterns and shadows, gifts across relationships / career / finances, a natal chart wheel, your astrocartography lines, and the day's transits. No two reports are alike.</p></details>
+      <details class="faq__item"><summary>How fast is it?</summary>
+        <p>Instant. You enter your details, pay through Stripe, and the PDF generates and downloads in your browser within a minute or two. There is no human in the loop and no waiting period.</p></details>
+      <details class="faq__item"><summary>How accurate is the astrology?</summary>
+        <p>Planetary positions are computed with Paul Schlyter's simplified formulas — accurate to roughly ±1° across the years 1900–2100, the same order of precision used by professional chart software. Houses use the whole-sign system.</p></details>
+      <details class="faq__item"><summary>Do I need my exact birth time?</summary>
+        <p>It helps a great deal. Your Rising sign and house placements depend on the time and place. If you don't know it, the planetary signs and the numerology are still exact — only the Rising sign and houses become approximate.</p></details>
+      <details class="faq__item"><summary>Is my data private?</summary>
+        <p>Your chart is computed entirely inside your browser — your birth details are never sent to or stored on a server. Payment is handled by Stripe; we never see your card. The free Frequency Reader's camera and microphone streams are released the instant a reading ends.</p></details>
+      <details class="faq__item"><summary>What's free and what's paid?</summary>
+        <p>Every interactive tool on this page is free to explore — the chart wheel, transits, astrocartography, the four oracles, and the healing frequencies. Only the downloadable written <strong>Soul Report ($15)</strong> and the <strong>Star Map poster ($9)</strong> are paid.</p></details>
+      <details class="faq__item"><summary>Can I get a refund?</summary>
+        <p>Because each report is an instant digital download generated uniquely for you, sales are final. But if anything fails to generate correctly, write to us and we will make it right.</p></details>
+      <details class="faq__item"><summary>What format is the report?</summary>
+        <p>A print-ready A4 PDF you can keep, print, frame, or share. It opens on any device.</p></details>
     </div>
   </section>
 
+
+  <!-- FOUNDER -->
+  <section class="founder" id="founder">
+    <div class="founder__inner">
+      <p class="founder__eyebrow mono mono--small">WHO MADE THIS</p>
+      <blockquote class="founder__quote">
+        <p>Tajnstvo — Old Church Slavonic for <em>the mystery</em> — began as an obsession with two traditions that rarely meet: the precise, ancient mathematics of Hellenistic astrology, and the folk divination practised in my family with molten lead. I built the astronomical engine from scratch so every chart is honest math rather than a lookup table, and wrote every interpretation by hand.</p>
+        <p>There is no call centre and no upsell funnel here — just one carefully made report, generated the moment you ask for it.</p>
+      </blockquote>
+      <p class="founder__sign mono mono--small">— THE MAKER OF TAJNSTVO</p>
+      <p class="founder__cta"><a href="#hero" class="btn btn--solid">Get your Soul Report · $15</a> <a href="/spec" class="founder__speclink mono mono--small">Read the technical spec →</a></p>
+    </div>
+  </section>
 </main>
 
 <footer class="footer">
@@ -848,6 +736,8 @@
     </footer>
   </div>
 </aside>
+
+<a class="sticky-cta" href="#hero" id="stickyCta">Get your Soul Report · $15</a>
 
 <script src="app.js" defer></script>
 </body>
