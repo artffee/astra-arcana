@@ -282,6 +282,33 @@
     return norm360(125.1228 - 0.0529538083 * d);
   }
 
+  // ---- numerology ----
+  function reduceNumber(n) {
+    while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+      n = String(n).split('').reduce((a, b) => a + Number(b), 0);
+    }
+    return n;
+  }
+  const PYTH = { a:1,j:1,s:1, b:2,k:2,t:2, c:3,l:3,u:3, d:4,m:4,v:4, e:5,n:5,w:5,
+                 f:6,o:6,x:6, g:7,p:7,y:7, h:8,q:8,z:8, i:9,r:9 };
+  function nameNumber(name, mode) {
+    const vowels = 'aeiou';
+    let sum = 0;
+    for (const ch of (name || '').toLowerCase()) {
+      if (!PYTH[ch]) continue;
+      const isVowel = vowels.includes(ch);
+      if (mode === 'vowels' && !isVowel) continue;
+      if (mode === 'consonants' && isVowel) continue;
+      sum += PYTH[ch];
+    }
+    return sum ? reduceNumber(sum) : null;
+  }
+  function birthdayNumber(birthDate) {
+    if (!birthDate) return null;
+    const day = parseInt(birthDate.split('-')[2], 10);
+    return isFinite(day) ? reduceNumber(day) : null;
+  }
+
   // Whole-sign house of a planet given the ascendant longitude.
   // 1st house = sign of Asc, 2nd = next sign, etc.
   function houseOfPlanet(planetLon, ascLon) {
@@ -1007,7 +1034,7 @@
       rule(H - 14);
     }
 
-    const totalPages = 6 + (aiReading && aiReading.length ? 1 : 0);
+    const totalPages = 7 + (aiReading && aiReading.length ? 1 : 0);
 
     // ============== PAGE 1 — COVER + PLACEMENTS ==============
     pageFrame(1, totalPages, 'NATAL REPORT');
@@ -1246,9 +1273,78 @@
       }
     }
 
-    // ============== PAGE 4 — WOUNDS + DOMAINS ==============
+    // ============== PAGE 4 — NUMEROLOGY ==============
     doc.addPage();
-    pageFrame(4, totalPages, 'WOUNDS  ·  DOMAINS');
+    pageFrame(4, totalPages, 'NUMEROLOGY');
+
+    {
+      const ND = (window.tajnstvoSoulData || {});
+      const NUM = ND.NUMBER_MEANINGS || {};
+      const POS = ND.NUMBER_POSITIONS || {};
+
+      setText(text);
+      doc.setFont('times', 'normal');
+      doc.setFontSize(22);
+      doc.text('Numerology', M, 34);
+      rule(38);
+
+      setText(muted);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text('YOUR NAME AND BIRTH DATE REDUCE TO A SET OF CORE NUMBERS. EACH NAMES A DIFFERENT LAYER OF YOU.', M, 46);
+
+      const pname = (chart.profile.name || '').trim();
+      const items = [];
+      items.push({ label: 'Life Path',   num: chart.lifePath,                         pos: POS.lifePath });
+      items.push({ label: 'Birthday',    num: birthdayNumber(chart.profile.birthDate), pos: POS.birthday });
+      if (pname) {
+        items.push({ label: 'Expression',  num: nameNumber(pname, 'all'),         pos: POS.expression });
+        items.push({ label: 'Soul Urge',   num: nameNumber(pname, 'vowels'),      pos: POS.soulUrge });
+        items.push({ label: 'Personality', num: nameNumber(pname, 'consonants'),  pos: POS.personality });
+      }
+
+      let y = 60;
+      for (const it of items) {
+        if (it.num == null) continue;
+        const meaning = NUM[it.num] || { title: '', text: '' };
+        if (y > 250) { doc.addPage(); pageFrame(4, totalPages, 'NUMEROLOGY (CONT.)'); y = 40; }
+        // big italic numeral
+        setText(accent);
+        doc.setFont('times', 'italic');
+        doc.setFontSize(36);
+        doc.text(String(it.num), M, y + 9);
+        // label + archetype
+        setText(text);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(15);
+        doc.text(it.label + (meaning.title ? '  \u00b7  ' + meaning.title : ''), M + 22, y);
+        // position framing
+        setText(muted);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.text((it.pos || '').toUpperCase(), M + 22, y + 6);
+        // meaning paragraph
+        setText(text);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(10.5);
+        const lines = doc.splitTextToSize(meaning.text || '', W - M - (M + 22));
+        let yy = y + 12.5;
+        for (const ln of lines) { doc.text(ln, M + 22, yy); yy += 5; }
+        y = Math.max(yy, y + 24) + 9;
+      }
+
+      if (!pname) {
+        setText(muted);
+        doc.setFont('times', 'italic');
+        doc.setFontSize(10.5);
+        const note = 'Add your name in the birth profile to unlock the Expression, Soul Urge, and Personality numbers \u2014 the three readings drawn from the letters of a name.';
+        for (const ln of doc.splitTextToSize(note, W - 2 * M)) { doc.text(ln, M, y + 2); y += 5.5; }
+      }
+    }
+
+    // ============== PAGE 5 — WOUNDS + DOMAINS ==============
+    doc.addPage();
+    pageFrame(5, totalPages, 'WOUNDS  ·  DOMAINS');
 
     {
       const D = window.tajnstvoSoulData || { SIGN_TEXTS:{} };
@@ -1334,9 +1430,9 @@
       }
     }
 
-    // ============== PAGE 5 — ASTROCARTOGRAPHY MAP ==============
+    // ============== PAGE 6 — ASTROCARTOGRAPHY MAP ==============
     doc.addPage();
-    pageFrame(5, totalPages, 'ASTROCARTOGRAPHY');
+    pageFrame(6, totalPages, 'ASTROCARTOGRAPHY');
 
     setText(text);
     doc.setFont('times', 'normal');
@@ -1378,9 +1474,9 @@
       mly += 5.5;
     }
 
-    // ============== PAGE 6 — ASPECTS + TRANSITS ==============
+    // ============== PAGE 7 — ASPECTS + TRANSITS ==============
     doc.addPage();
-    pageFrame(6, totalPages, 'ASPECTS  ·  TRANSITS');
+    pageFrame(7, totalPages, 'ASPECTS  ·  TRANSITS');
 
     setText(text);
     doc.setFont('times', 'normal');
@@ -1457,10 +1553,10 @@
       );
     }
 
-    // ============== PAGE 7 (optional) — AI NATAL READING ==============
+    // ============== PAGE 8 (optional) — AI NATAL READING ==============
     if (aiReading && aiReading.length) {
       doc.addPage();
-      pageFrame(7, totalPages, 'NATAL READING');
+      pageFrame(8, totalPages, 'NATAL READING');
 
       setText(text);
       doc.setFont('times', 'normal');
@@ -1479,7 +1575,7 @@
       let ry = 60;
       const lineHeight = 5.2;
       const maxWidth = W - 2 * M;
-      let pageNum = 7;
+      let pageNum = 8;
 
       const isLabel = (s) =>
         s.length <= 40 && /[A-Z]/.test(s) && s === s.toUpperCase() && !/[a-z]/.test(s);

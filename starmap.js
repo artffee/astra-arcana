@@ -279,7 +279,7 @@
     doc.setTextColor(accent[0], accent[1], accent[2]);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text('TAJNSTVO   ·   STAR MAP', W / 2, 22, { align: 'center' });
+    doc.text('STAR MAP', W / 2, 22, { align: 'center' });
 
     flourish(doc, W / 2, 28, 36, accent);
 
@@ -418,7 +418,7 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.text(
-      'TAJNSTVO   ·   CELESTIAL ATLAS   ·   TAJNSTVO.COM',
+      'CELESTIAL ATLAS   ·   TAJNSTVOTO.COM',
       W / 2, H - 16, { align: 'center' }
     );
 

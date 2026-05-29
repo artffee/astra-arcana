@@ -168,5 +168,31 @@
     integration:   'What life looks like when the energy is embodied and steady.',
   };
 
-  window.tajnstvoSoulData = { SIGN_TEXTS, LIFE_PATH, NORTH_NODE, PHASES };
+  // Numerology — meaning of each reduced number (1-9 + masters 11/22/33).
+  // Shared across all positions; the position framing (below) gives the lens.
+  const NUMBER_MEANINGS = {
+    1:  { title: 'The Leader',        text: 'Independent, pioneering, self-starting — the number of initiative and the will to go first. You are built to originate rather than follow. Its shadow is domination, or the loneliness of always being out front.' },
+    2:  { title: 'The Diplomat',      text: 'Sensitive, cooperative, deeply attuned to others — the number of partnership and peace-making. You read a room before you enter it. Its shadow is self-erasure and over-dependence on being needed.' },
+    3:  { title: 'The Communicator',  text: 'Expressive, creative, joyful — the number of the voice, art, and delight. You are here to be heard and to lift the mood of the room. Its shadow is scattering your gift across too many things at once.' },
+    4:  { title: 'The Builder',       text: 'Disciplined, practical, steady — the number of foundations and honest work. You make things that last because you do the unglamorous parts. Its shadow is rigidity, and mistaking the grind for the point.' },
+    5:  { title: 'The Adventurer',    text: 'Free, curious, sensual — the number of change, travel, and the five senses. You learn by moving and by saying yes to the unfamiliar. Its shadow is restlessness and excess that never lets a thing root.' },
+    6:  { title: 'The Nurturer',      text: 'Responsible, loving, aesthetic — the number of home, family, and beauty. You hold other people together, often by instinct. Its shadow is martyrdom, and control disguised as care.' },
+    7:  { title: 'The Seeker',        text: 'Analytical, spiritual, inward — the number of study, solitude, and the unseen. You go deep where others stay on the surface. Its shadow is withdrawal, and a mistrust that keeps the world at arm’s length.' },
+    8:  { title: 'The Achiever',      text: 'Ambitious, capable, material — the number of power, money, and mastery in the visible world. You are built to wield resources at scale. Its shadow is workaholism, and letting the empire eat the soul.' },
+    9:  { title: 'The Humanitarian',  text: 'Compassionate, wise, completing — the number of service and the wider human field. You are an old soul asked to give without keeping score. Its shadow is self-sacrifice, and an aloofness that never lets anyone close.' },
+    11: { title: 'The Visionary',     text: 'A master frequency: intuitive, inspired, electric — a high-voltage channel for insight and inspiration. You sense what is coming before it arrives. Its shadow is a raw nervous system and anxiety that needs careful tending.' },
+    22: { title: 'The Master Builder',text: 'A master frequency: vision made practical — the number that turns a dream into a structure that outlasts it. You can build at a scale most people only imagine. Its shadow is overwhelm under the weight of your own vision.' },
+    33: { title: 'The Master Teacher',text: 'A master frequency: compassionate service raised to a calling — you teach by what you live, not what you say. Few carry this; fewer carry it cleanly. Its shadow is self-neglect in the name of everyone else.' },
+  };
+
+  // How each numerology position is derived + the lens it gives.
+  const NUMBER_POSITIONS = {
+    lifePath:    'From your full birth date — the road you are here to walk',
+    birthday:    'From the day of the month you were born — a specific, ready-made talent',
+    expression:  'From every letter of your name — your natural gifts and how you act',
+    soulUrge:    'From the vowels of your name — what your heart quietly wants',
+    personality: 'From the consonants — the version of you that others meet first',
+  };
+
+  window.tajnstvoSoulData = { SIGN_TEXTS, LIFE_PATH, NORTH_NODE, PHASES, NUMBER_MEANINGS, NUMBER_POSITIONS };
 })();
