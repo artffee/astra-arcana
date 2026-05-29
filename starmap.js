@@ -418,7 +418,7 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.text(
-      'TAJNSTVO   ·   CELESTIAL ATLAS   ·   TAJNSTVO.VERCEL.APP',
+      'TAJNSTVO   ·   CELESTIAL ATLAS   ·   TAJNSTVO.COM',
       W / 2, H - 16, { align: 'center' }
     );
 

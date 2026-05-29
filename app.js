@@ -957,7 +957,7 @@
       doc.text(`${num} / ${total}`, W - M, 12, { align: 'right' });
       rule(16);
       // footer
-      doc.text('tajnstvo.vercel.app', M, H - 10);
+      doc.text('tajnstvoto.com', M, H - 10);
       doc.text(new Date().toISOString().slice(0, 10), W - M, H - 10, { align: 'right' });
       rule(H - 14);
     }
