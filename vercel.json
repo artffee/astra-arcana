@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.tajnstvoto.com" }],
+      "destination": "https://tajnstvoto.com/:path*",
+      "permanent": true
+    }
+  ]
+}
